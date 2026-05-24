@@ -1,0 +1,9 @@
+{
+  "name": "codex-ultra-pro-max",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "cli",
+    "web"
+  ]
+}
