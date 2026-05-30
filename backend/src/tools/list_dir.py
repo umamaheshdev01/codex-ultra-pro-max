@@ -10,7 +10,7 @@ schema = {
     },
 }
 
-SKIPPED_DIRS = {"node_modules", ".git", ".next", "__pycache__", "venv", ".venv"}
+SKIPPED_DIRS = {"node_modules", ".git", "__pycache__", "venv", ".venv"}
 
 
 def _resolve_project_root(project_root: str) -> str:

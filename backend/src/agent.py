@@ -1,16 +1,40 @@
 import json
+import os
+from pathlib import Path
 
 from openai import AsyncOpenAI
+from dotenv import dotenv_values
 
+from src.mcp_manager import MCPManager
 from src.tools import TOOL_SCHEMAS, execute_tool
 
+DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1"
 
-async def run_agent(messages, project_root, on_tool_call):
-    client = AsyncOpenAI()
+
+def _create_openai_client():
+    env_path = Path(__file__).resolve().parents[2] / ".env"
+    env_values = dotenv_values(env_path)
+    api_key = env_values.get("OPENAI_API_KEY") or os.environ.get("OPENAI_API_KEY")
+    base_url = env_values.get("OPENAI_BASE_URL") or DEFAULT_OPENAI_BASE_URL
+
+    return AsyncOpenAI(api_key=api_key, base_url=base_url)
+
+
+async def run_agent(
+    messages,
+    project_root,
+    on_tool_call,
+    mcp_manager: MCPManager | None = None,
+):
+    client = _create_openai_client()
+    tools = TOOL_SCHEMAS
+    if mcp_manager:
+        tools = TOOL_SCHEMAS + mcp_manager.get_openai_schemas()
+
     while True:
         stream = await client.chat.completions.create(
             model="gpt-4o",
-            tools=TOOL_SCHEMAS,
+            tools=tools,
             messages=messages,
             stream=True,
         )
@@ -51,8 +75,13 @@ async def run_agent(messages, project_root, on_tool_call):
 
         for t in tool_calls_raw.values():
             args = json.loads(t["arguments"])
-            result = await execute_tool(t["name"], args, project_root)
-            await on_tool_call(t["name"], args, result)
+            tool_name = t["name"]
+            if mcp_manager and tool_name in mcp_manager.tool_to_server:
+                result = await mcp_manager.execute(tool_name, args)
+            else:
+                result = await execute_tool(tool_name, args, project_root)
+
+            await on_tool_call(tool_name, args, result)
             messages.append(
                 {
                     "role": "tool",

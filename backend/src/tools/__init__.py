@@ -9,7 +9,13 @@ TOOL_MODULES = {
     list_dir.schema["name"]: list_dir,
 }
 
-TOOL_SCHEMAS = [tool.schema for tool in TOOL_MODULES.values()]
+TOOL_SCHEMAS = [
+    {
+        "type": "function",
+        "function": tool.schema,
+    }
+    for tool in TOOL_MODULES.values()
+]
 
 
 async def execute_tool(name: str, args: dict, project_root: str) -> str:

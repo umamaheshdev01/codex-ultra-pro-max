@@ -1,13 +1,13 @@
 {
-  "name": "@codex-ultra-pro-max/cli",
+  "name": "@helix/cli",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "bin": {
-    "codex": "./bin/codex.js"
+    "helix": "./bin/helix.js"
   },
   "scripts": {
-    "dev": "node bin/codex.js"
+    "dev": "node bin/helix.js"
   },
   "dependencies": {
     "chalk": "^5.3.0",

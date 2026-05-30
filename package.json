@@ -1,9 +1,15 @@
 {
-  "name": "codex-ultra-pro-max",
+  "name": "helix",
   "private": true,
+  "bin": {
+    "helix": "cli/bin/helix.js"
+  },
+  "scripts": {
+    "helix": "node cli/bin/helix.js",
+    "dev": "node cli/bin/helix.js",
+    "install-global": "npm link"
+  },
   "workspaces": [
-    "backend",
-    "cli",
-    "web"
+    "cli"
   ]
 }
